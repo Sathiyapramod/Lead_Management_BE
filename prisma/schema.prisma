@@ -1,0 +1,174 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum RoleId {
+  manager
+  admin
+}
+
+enum Roles {
+  KAM
+  lead
+  contact
+}
+
+model Users {
+  id        Int        @id @default(autoincrement())
+  username  String     @unique
+  password  String
+  role      Roles
+  time_id   Int?
+  TimeZones TimeZones? @relation(fields: [time_id], references: [id])
+}
+
+model TimeZones {
+  id        Int     @id @default(autoincrement())
+  timezone  String  @unique
+  time_diff String
+  users     Users[]
+}
+
+model Managers {
+  id         Int      @id @default(autoincrement())
+  mgr_name   String
+  role       RoleId
+  phone      String
+  leads      Leads[]  @relation("ManagerLeads")
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+enum CallFreq {
+  daily
+  weekly
+}
+
+model Leads {
+  id                Int         @id @default(autoincrement())
+  lead_name         String
+  rest_name         String
+  rest_addr1        String
+  rest_addr2        String?
+  phone             String?
+  mgr_id            Int
+  lead_status       Boolean
+  call_freq         CallFreq
+  last_call_date    DateTime?
+  orders_placed     Int?
+  orders_done       Int?
+  created_at        DateTime    @default(now())
+  updated_at        DateTime    @updatedAt
+  contacts          Contacts[]  @relation("LeadContacts")
+  manager           Managers    @relation("ManagerLeads", fields: [mgr_id], references: [id])
+  call_logs         Call_Logs[] @relation("LeadCalls")
+  invoices          Invoices[]  @relation("InvoiceLeads")
+  acc_perfs         AccPerf[]
+  acc_opportunities AccOpps[]
+}
+
+enum Contact_Roles {
+  owner
+  general_manager
+  procurement
+  sales
+  chef
+}
+
+model Contacts {
+  id         Int           @id @default(autoincrement())
+  lead_id    Int
+  cnct_name  String
+  cnct_role  Contact_Roles
+  cnct_info  String
+  phone      String?
+  created_at DateTime      @default(now())
+  updated_at DateTime      @updatedAt
+  lead       Leads         @relation("LeadContacts", fields: [lead_id], references: [id])
+  // call_logs  Call_Logs[]   @relation("ContactCall_Logs")
+}
+
+model Call_Logs {
+  id            Int      @id @default(autoincrement())
+  sid           String   @unique
+  lead_id       Int
+  from_id       Int
+  start_time    DateTime
+  end_time      DateTime
+  status        String
+  duration      String
+  recording_sid String?
+  recording_uri String?
+  created_at    DateTime @default(now())
+  leads         Leads    @relation("LeadCalls", fields: [lead_id], references: [id])
+  // contact       Contacts @relation("ContactCall_Logs", fields: [contact_id], references: [id])
+}
+
+enum InvoiceStatus {
+  Created
+  Sent
+  Paid
+  Overdue
+}
+
+model Invoices {
+  id          Int           @id @default(autoincrement())
+  lead_id     Int
+  account_id  Int?
+  invoice_num String
+  amount      Decimal
+  status      InvoiceStatus
+  due_date    DateTime?
+  created_at  DateTime      @default(now())
+  updated_at  DateTime      @updatedAt
+  lead        Leads         @relation("InvoiceLeads", fields: [lead_id], references: [id])
+}
+
+enum Score {
+  one
+  two
+  three
+  four
+  five
+}
+
+enum Opp {
+  new
+  won
+  lost
+}
+
+model AccPerf {
+  id          Int      @id @default(autoincrement())
+  lead_id     Int
+  revenue     Int
+  growth_rate Int
+  score       Score
+  last_review DateTime
+  next_review DateTime
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  lead        Leads    @relation(fields: [lead_id], references: [id])
+}
+
+model AccOpps {
+  id         Int      @id @default(autoincrement())
+  lead_id    Int
+  name       String
+  status     Opp
+  close_date DateTime
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  lead       Leads    @relation(fields: [lead_id], references: [id])
+}
