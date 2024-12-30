@@ -48,6 +48,8 @@ model Managers {
   leads      Leads[]  @relation("ManagerLeads")
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+
+  @@index([phone])
 }
 
 enum CallFreq {
@@ -76,6 +78,8 @@ model Leads {
   invoices          Invoices[]  @relation("InvoiceLeads")
   acc_perfs         AccPerf[]
   acc_opportunities AccOpps[]
+
+  @@index([phone])
 }
 
 enum Contact_Roles {
@@ -96,7 +100,8 @@ model Contacts {
   created_at DateTime      @default(now())
   updated_at DateTime      @updatedAt
   lead       Leads         @relation("LeadContacts", fields: [lead_id], references: [id])
-  // call_logs  Call_Logs[]   @relation("ContactCall_Logs")
+
+  @@index([phone])
 }
 
 model Call_Logs {
@@ -112,7 +117,8 @@ model Call_Logs {
   recording_uri String?
   created_at    DateTime @default(now())
   leads         Leads    @relation("LeadCalls", fields: [lead_id], references: [id])
-  // contact       Contacts @relation("ContactCall_Logs", fields: [contact_id], references: [id])
+
+  @@index([sid])
 }
 
 enum InvoiceStatus {

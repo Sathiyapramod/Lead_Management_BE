@@ -44,7 +44,7 @@ export class LeadsService {
     });
   }
 
-  async get(query: GetLeadsQuery): Promise<Leads[]> {
+  async get(query: GetLeadsQuery) {
     const {
       call_freq,
       last_call_date,
@@ -84,13 +84,13 @@ export class LeadsService {
         },
       ];
     }
-    console.log({ limit, offset });
+    const count = await this.prisma.leads.count();
     const leads = await this.prisma.leads.findMany({
       where,
       take: Number(limit) ?? 10,
       skip: Number(offset) ?? 0,
     });
-    return leads;
+    return { count, leads };
   }
 
   async getById(id: number): Promise<Leads> {
@@ -108,5 +108,31 @@ export class LeadsService {
         lead_status: true,
       },
     });
+  }
+
+  async findLeadByPhoneNo(phone: string): Promise<{ id: number }> {
+    try {
+      return await this.prisma.leads.findFirst({
+        where: { phone },
+        select: { id: true },
+      });
+    } catch (err) {
+      console.log(err);
+      throw new Error('Failed to find Lead');
+    }
+  }
+
+  async updateCallHistory(lead_id: number, last_call_date: Date) {
+    try {
+      await this.prisma.leads.update({
+        where: { id: lead_id },
+        data: {
+          last_call_date,
+        },
+      });
+    } catch (err) {
+      console.log(err);
+      throw new Error('Failed to find Lead');
+    }
   }
 }

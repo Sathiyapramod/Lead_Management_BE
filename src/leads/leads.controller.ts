@@ -8,7 +8,6 @@ import {
   Query,
   Patch,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import { LeadsService } from './leads.service';
 import { Leads } from '@prisma/client';
@@ -40,11 +39,7 @@ export class LeadsController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get All Leads' })
   @ApiBearerAuth()
-  async findAll(
-    @Query() query: GetLeadsQuery,
-    @Req() request: any,
-  ): Promise<Leads[]> {
-    const userId = request.user.userId;
+  async findAll(@Query() query: GetLeadsQuery) {
     return await this.leadService.get(query);
   }
 
@@ -52,8 +47,7 @@ export class LeadsController {
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Get Lead by id' })
   @ApiBearerAuth()
-  async findByid(@Param('id') id: string, @Req() request: any): Promise<Leads> {
-    const userId = request.user.id;
+  async findByid(@Param('id') id: string): Promise<Leads> {
     return await this.leadService.getById(Number(id));
   }
 

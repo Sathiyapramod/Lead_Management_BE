@@ -25,4 +25,16 @@ export class ManagersService {
   async remove(id: number): Promise<void> {
     await this.prisma.managers.delete({ where: { id } });
   }
+
+  async findKAMByPhoneNo(phone: string): Promise<{ id: number }> {
+    try {
+      return await this.prisma.managers.findFirst({
+        where: { phone },
+        select: { id: true },
+      });
+    } catch (err) {
+      console.log(err);
+      throw new Error('Failed to find Lead');
+    }
+  }
 }

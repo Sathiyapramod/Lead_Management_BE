@@ -1,6 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import * as timezone from '../src/utils/timezone.json';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 const prisma = new PrismaClient();
 
@@ -12,7 +14,7 @@ async function main() {
     data: {
       mgr_name: faker.person.firstName(),
       role: 'manager',
-      phone: faker.phone.number({ style: 'international' }),
+      phone: process.env.TWILIO_PHONE_NUMBER,
     },
   });
 
@@ -29,11 +31,15 @@ async function main() {
         rest_addr1: faker.location.streetAddress(),
         rest_addr2: faker.location.secondaryAddress(),
         mgr_id: id,
-        lead_status: false,
+        lead_status: i % 2 === 0 ? false : true,
         phone: faker.phone.number({ style: 'international' }),
         orders_placed: faker.number.int({ min: 0, max: 10 }),
         orders_done: faker.number.int({ min: 0, max: 10 }),
         call_freq: i % 2 === 0 ? 'weekly' : 'daily',
+        last_call_date: faker.date.between({
+          from: '2024-12-01',
+          to: Date.now(),
+        }),
       },
     });
     leads.push(newLead['id']);

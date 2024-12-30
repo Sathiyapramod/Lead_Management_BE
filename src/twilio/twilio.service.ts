@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Twilio } from 'twilio';
-import { RecordCallDto } from './dto/createCall.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import moment from 'moment-timezone';
+import { LeadsService } from 'src/leads/leads.service';
+import { ManagersService } from 'src/managers/managers.service';
+import * as moment from 'moment-timezone';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const AccessToken = require('twilio').jwt.AccessToken;
 
 @Injectable()
 export class TwilioService {
@@ -12,6 +15,8 @@ export class TwilioService {
   constructor(
     private configService: ConfigService,
     private readonly prisma: PrismaService,
+    private readonly leads: LeadsService,
+    private readonly managers: ManagersService,
   ) {
     this.client = new Twilio(
       process.env.TWILIO_KEY_SID,
@@ -26,36 +31,116 @@ export class TwilioService {
   async makeCall(to: string): Promise<void> {
     const from = process.env.TWILIO_PHONE_NUMBER;
     try {
-      const call = await this.client.calls.create({
+      await this.client.calls.create({
         from,
         to,
-        twiml: '<Response><Say>Ahoy, World!</Say></Response>',
         url: 'http://demo.twilio.com/docs/voice.xml',
+        record: true,
+        recordingStatusCallback: `${process.env.DEMO_PUBLIC_URL}/call-logs/record-callback`,
       });
-      const { startTime, endTime, status, dateCreated, sid } = call;
-      this.callLog({ startTime, endTime, status, dateCreated, sid }, to);
+      console.log(`Call is Queued`);
     } catch (err) {
       console.log('err', err);
       throw new Error('Failed to make call');
     }
   }
 
-  private async callLog(data: RecordCallDto, to: string): Promise<void> {
-    const { startTime, endTime, status, sid } = data;
+  async recordCallback(data: {
+    RecordingUrl: string;
+    CallSid: string;
+    RecordingDuration: string;
+    RecordingStartTime: string;
+    RecordingStatus: string;
+  }) {
+    try {
+      const {
+        RecordingUrl,
+        CallSid,
+        RecordingDuration,
+        RecordingStartTime,
+        RecordingStatus,
+      } = data;
 
-    const start_time = moment.tz(startTime, 'Asia/Kolkata').utc().toDate();
-    const end_time = moment.tz(endTime, 'Asia/Kolkata').utc().toDate();
+      const { from, to } = await this.client.calls(CallSid).fetch();
 
-    await this.prisma.call_Logs.create({
-      data: {
-        sid,
-        lead_id: Number(to),
-        start_time,
-        from_id: 2,
-        end_time,
-        status,
-        duration: String(startTime),
-      },
-    });
+      //find lead id
+      const lead = await this.leads.findLeadByPhoneNo(to);
+      //find kam id
+      const kam = await this.managers.findKAMByPhoneNo(from);
+
+      const start_time = new Date(RecordingStartTime);
+
+      const durationInSeconds = parseInt(RecordingDuration, 10);
+      const end_time = new Date(
+        start_time.getTime() + durationInSeconds * 1000,
+      );
+
+      console.log(`Storing Call Log !!!`);
+      await this.prisma.call_Logs.create({
+        data: {
+          recording_uri: RecordingUrl,
+          recording_sid: CallSid,
+          sid: CallSid,
+          lead_id: lead.id,
+          from_id: kam.id,
+          status: RecordingStatus,
+          duration: RecordingDuration,
+          start_time: start_time.toISOString(),
+          end_time: end_time.toISOString(),
+        },
+      });
+      console.log(`Updating Lead data !!!`);
+      await this.leads.updateCallHistory(lead.id, new Date(RecordingStartTime));
+    } catch (err) {
+      console.log('err', err);
+      throw new Error('Failed to Record call');
+    }
+  }
+
+  async getCallLogs(timezone: string) {
+    try {
+      const callLogs = await this.prisma.call_Logs.findMany();
+      return callLogs.map((call) => {
+        const start_time = moment(call.start_time).tz(timezone).format();
+        const end_time = moment(call.end_time).tz(timezone).format();
+        console.log({
+          start_time: new Date(),
+          end_time: new Date(end_time),
+        });
+        return {
+          ...call,
+          start_time,
+          end_time,
+        };
+      });
+    } catch (err) {
+      console.log('err', err);
+      throw new Error('Failed to Record call');
+    }
+  }
+
+  async getToken() {
+    try {
+      const VoiceGrant = AccessToken.VoiceGrant;
+      const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
+      const twilioApiKey = process.env.TWILIO_KEY_SID;
+      const twilioApiSecret = process.env.TWILIO_KEY_SECRET;
+
+      const identity = 'user';
+      const voiceGrant = new VoiceGrant({
+        incomingAllow: true,
+      });
+
+      const token = new AccessToken(
+        twilioAccountSid,
+        twilioApiKey,
+        twilioApiSecret,
+        { identity: identity },
+      );
+      token.addGrant(voiceGrant);
+      return token.toJwt();
+    } catch (error) {
+      throw error;
+    }
   }
 }

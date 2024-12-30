@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
-import { TimeZones, Users } from '@prisma/client';
+import { TimeZones } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -15,7 +15,6 @@ export class AuthService {
 
   async validateUser({ username, password }) {
     const user = await this.usersService.findOne(username);
-    console.log(JSON.stringify(user, null, 2));
     if (user && (await bcrypt.compare(password, user.password))) {
       return user;
     }

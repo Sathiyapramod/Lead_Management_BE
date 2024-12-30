@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { CreateContactDto, GetContactsQuery } from './dto/create-contact.dto';
 import { Contacts } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { CreateContactDto, GetContactsQuery } from './dto/create-contact.dto';
 
 @Injectable()
 export class ContactsService {
@@ -14,16 +14,21 @@ export class ContactsService {
     });
   }
 
-  async findAll(query: GetContactsQuery): Promise<Contacts[]> {
+  async findAll(query: GetContactsQuery) {
     const { limit, offset, lead_id } = query;
     const where: any = {};
     if (lead_id) where.lead_id = Number(lead_id);
 
-    return await this.prisma.contacts.findMany({
+    const contacts = await this.prisma.contacts.findMany({
       where,
       take: limit ? Number(limit) : 10,
       skip: offset ? Number(offset) : 0,
     });
+
+    const count = await this.prisma.contacts.count();
+
+    // todo
+    return { contacts, count, active: count, pending: 0 };
   }
 
   async findOne(id: number): Promise<Contacts> {

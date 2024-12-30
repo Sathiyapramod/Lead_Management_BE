@@ -26,7 +26,6 @@ export class AuthController {
     cred: CreateUserDto,
   ) {
     const { username, password, role, time_id } = cred;
-    console.log({ username, password, role, time_id });
     return this.userservice.create({ username, password, role, time_id });
   }
 
