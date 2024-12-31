@@ -61,6 +61,29 @@ async function main() {
       });
   }
 
+  /*---------------- Orders --------------- */
+  console.log(`Seeding Orders !!`);
+
+  const ordersPerLead = 3;
+  for (const lead of leads) {
+    for (let j = 0; j < ordersPerLead; j++)
+      await prisma.orders.create({
+        data: {
+          lead_id: lead,
+          order_value: faker.number.int({ min: 100000, max: 500000 }),
+          placed_on: faker.date.between({
+            from: '2024-12-01',
+            to: Date.now(),
+          }),
+          closed_on: faker.date.between({
+            from: '2024-12-10',
+            to: Date.now(),
+          }),
+          isCreated: true,
+          isApproved: false,
+        },
+      });
+  }
   /*---------------- Time Zones --------------- */
   console.log(`Seeding Timezones !!`);
   for (const [key, value] of Object.entries(timezone))

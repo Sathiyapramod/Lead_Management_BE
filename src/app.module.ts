@@ -13,6 +13,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtService } from '@nestjs/jwt';
 import { CallsModule } from './calls/calls.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { CallsModule } from './calls/calls.module';
     UsersModule,
     AuthModule,
     CallsModule,
+    OrdersModule,
   ],
   controllers: [AppController, TwilioController],
   providers: [AppService, PrismaService, TwilioService, JwtService],

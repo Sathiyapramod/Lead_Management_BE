@@ -78,6 +78,7 @@ model Leads {
   invoices          Invoices[]  @relation("InvoiceLeads")
   acc_perfs         AccPerf[]
   acc_opportunities AccOpps[]
+  Orders            Orders[]
 
   @@index([phone])
 }
@@ -177,4 +178,18 @@ model AccOpps {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   lead       Leads    @relation(fields: [lead_id], references: [id])
+}
+
+model Orders {
+  id          Int       @id @default(autoincrement())
+  lead_id     Int
+  lead        Leads     @relation(fields: [lead_id], references: [id])
+  order_value Int
+  placed_on   DateTime
+  closed_on   DateTime?
+  isCreated   Boolean
+  isApproved  Boolean
+  approved_on DateTime?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
 }

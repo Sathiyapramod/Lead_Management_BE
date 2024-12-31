@@ -52,6 +52,7 @@ export class LeadsService {
       offset = 0,
       mgr_id,
       today,
+      searchName,
     } = query;
     const where: any = {};
 
@@ -84,6 +85,7 @@ export class LeadsService {
         },
       ];
     }
+    if (searchName) where.lead_name = { startsWith: searchName };
     const count = await this.prisma.leads.count();
     const leads = await this.prisma.leads.findMany({
       where,

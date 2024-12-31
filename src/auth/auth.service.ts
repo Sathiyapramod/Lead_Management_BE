@@ -30,6 +30,7 @@ export class AuthService {
     };
     return {
       access_token: await this.jwtService.signAsync(payload),
+      username: user.username,
       role: user.role,
       userId: user.id,
       timezone: user.TimeZones.timezone,

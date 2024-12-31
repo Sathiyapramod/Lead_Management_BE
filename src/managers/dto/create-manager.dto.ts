@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsString, IsOptional } from 'class-validator';
 
 enum RoleId {
   admin = 'admin',
@@ -14,4 +14,15 @@ export class CreateManagerDto {
 
   @IsString()
   phone: string;
+}
+
+export class GetManagersQuery {
+  @IsOptional()
+  limit: number;
+
+  @IsOptional()
+  offset: number;
+
+  @IsOptional()
+  searchName: string;
 }

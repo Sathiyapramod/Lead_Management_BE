@@ -131,6 +131,22 @@ CREATE TABLE `AccOpps` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- CreateTable
+CREATE TABLE `Orders` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `lead_id` INTEGER NOT NULL,
+    `order_value` INTEGER NOT NULL,
+    `placed_on` DATETIME(3) NOT NULL,
+    `closed_on` DATETIME(3) NULL,
+    `isCreated` BOOLEAN NOT NULL,
+    `isApproved` BOOLEAN NOT NULL,
+    `approved_on` DATETIME(3) NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- AddForeignKey
 ALTER TABLE `Users` ADD CONSTRAINT `Users_time_id_fkey` FOREIGN KEY (`time_id`) REFERENCES `TimeZones`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
@@ -151,3 +167,6 @@ ALTER TABLE `AccPerf` ADD CONSTRAINT `AccPerf_lead_id_fkey` FOREIGN KEY (`lead_i
 
 -- AddForeignKey
 ALTER TABLE `AccOpps` ADD CONSTRAINT `AccOpps_lead_id_fkey` FOREIGN KEY (`lead_id`) REFERENCES `Leads`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Orders` ADD CONSTRAINT `Orders_lead_id_fkey` FOREIGN KEY (`lead_id`) REFERENCES `Leads`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

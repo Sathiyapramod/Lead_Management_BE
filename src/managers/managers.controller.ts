@@ -1,6 +1,14 @@
-import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { ManagersService } from './managers.service';
-import { CreateManagerDto } from './dto/create-manager.dto';
+import { CreateManagerDto, GetManagersQuery } from './dto/create-manager.dto';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt.authguard';
 import { RolesGuard } from 'src/auth/roles.guard';
@@ -20,8 +28,8 @@ export class ManagersController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  findAll() {
-    return this.managersService.findAll();
+  findAll(@Query() query: GetManagersQuery) {
+    return this.managersService.findAll(query);
   }
 
   @Get(':id')

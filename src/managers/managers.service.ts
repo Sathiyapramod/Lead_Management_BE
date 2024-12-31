@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateManagerDto } from './dto/create-manager.dto';
+import { CreateManagerDto, GetManagersQuery } from './dto/create-manager.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Managers } from '@prisma/client';
 
@@ -14,8 +14,23 @@ export class ManagersService {
     });
   }
 
-  async findAll(): Promise<Managers[]> {
-    return await this.prisma.managers.findMany();
+  async findAll(query: GetManagersQuery) {
+    const { limit = 10, offset = 0, searchName = '' } = query;
+    const managers = await this.prisma.managers.findMany({
+      where: {
+        mgr_name: {
+          contains: searchName,
+        },
+      },
+      include: {
+        _count: true,
+      },
+      take: Number(limit) ?? 10,
+      skip: Number(offset) ?? 0,
+    });
+    const count = await this.prisma.managers.count();
+    const mgrs = managers.map((mgr) => ({ ...mgr, leads: mgr._count.leads }));
+    return { managers: mgrs, count, active: count, pending: 0 };
   }
 
   async findOne(id: number): Promise<Managers> {

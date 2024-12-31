@@ -103,10 +103,7 @@ export class TwilioService {
       return callLogs.map((call) => {
         const start_time = moment(call.start_time).tz(timezone).format();
         const end_time = moment(call.end_time).tz(timezone).format();
-        console.log({
-          start_time: new Date(),
-          end_time: new Date(end_time),
-        });
+
         return {
           ...call,
           start_time,

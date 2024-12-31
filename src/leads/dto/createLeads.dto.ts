@@ -58,4 +58,7 @@ export class GetLeadsQuery {
 
   @IsOptional()
   today: boolean;
+
+  @IsOptional()
+  searchName: string;
 }
