@@ -33,8 +33,8 @@ async function main() {
         mgr_id: id,
         lead_status: i % 2 === 0 ? false : true,
         phone: faker.phone.number({ style: 'international' }),
-        orders_placed: faker.number.int({ min: 0, max: 10 }),
-        orders_done: faker.number.int({ min: 0, max: 10 }),
+        orders_placed: 0,
+        orders_done: 0,
         call_freq: i % 2 === 0 ? 'weekly' : 'daily',
         last_call_date: faker.date.between({
           from: '2024-12-01',
@@ -66,7 +66,7 @@ async function main() {
 
   const ordersPerLead = 3;
   for (const lead of leads) {
-    for (let j = 0; j < ordersPerLead; j++)
+    for (let j = 0; j < ordersPerLead; j++) {
       await prisma.orders.create({
         data: {
           lead_id: lead,
@@ -83,6 +83,15 @@ async function main() {
           isApproved: false,
         },
       });
+      await prisma.leads.update({
+        where: { id: lead },
+        data: {
+          orders_placed: {
+            increment: 1,
+          },
+        },
+      });
+    }
   }
   /*---------------- Time Zones --------------- */
   console.log(`Seeding Timezones !!`);

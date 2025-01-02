@@ -14,6 +14,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtService } from '@nestjs/jwt';
 import { CallsModule } from './calls/calls.module';
 import { OrdersModule } from './orders/orders.module';
+import { PerformanceModule } from './performance/performance.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { OrdersModule } from './orders/orders.module';
     AuthModule,
     CallsModule,
     OrdersModule,
+    PerformanceModule,
   ],
   controllers: [AppController, TwilioController],
   providers: [AppService, PrismaService, TwilioService, JwtService],

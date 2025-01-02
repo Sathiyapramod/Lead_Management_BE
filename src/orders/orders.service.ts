@@ -1,14 +1,32 @@
 import { Injectable } from '@nestjs/common';
-import { GetOrdersQuery } from './dto/create-order.dto';
+import { createOrderDTO, GetOrdersQuery } from './dto/create-order.dto';
 
 import { PrismaService } from 'src/prisma/prisma.service';
+import { updateOrderDTO } from './dto/update-order.dto';
 
 @Injectable()
 export class OrdersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create() {
-    return 'This action adds a new order';
+  async create(order: createOrderDTO) {
+    const { lead_id, placed_on, order_value, isCreated, isApproved } = order;
+    await this.prisma.leads.update({
+      where: { id: lead_id },
+      data: {
+        orders_placed: {
+          increment: 1,
+        },
+      },
+    });
+    return await this.prisma.orders.create({
+      data: {
+        lead_id,
+        placed_on: new Date(placed_on),
+        order_value,
+        isCreated,
+        isApproved,
+      },
+    });
   }
 
   async findAll(query: GetOrdersQuery) {
@@ -16,7 +34,6 @@ export class OrdersService {
     const orders = await this.prisma.orders.findMany({
       take: Number(limit) ?? 10,
       skip: Number(offset) ?? 0,
-
       include: {
         lead: {
           select: {
@@ -24,12 +41,15 @@ export class OrdersService {
           },
         },
       },
+      orderBy: {
+        updated_at: 'desc',
+      },
     });
     const count = await this.prisma.orders.count();
     const active = await this.prisma.orders.count({
       where: {
         isCreated: true,
-        isApproved: false,
+        isApproved: true,
       },
     });
     const newOrders = orders.map((odr) => ({
@@ -39,15 +59,32 @@ export class OrdersService {
     return { orders: newOrders, count, active, pending: count - active };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
+  async findOne(id: number) {
+    return await this.prisma.orders.findFirst({ where: { id } });
   }
 
-  update(id: number) {
-    return `This action updates a #${id} order`;
-  }
+  async update(id: number, body: updateOrderDTO) {
+    const { isCreated = true, isApproved, lead_id, approved_on } = body;
+    const data: any = {};
+    if (isCreated) data.isCreated = isCreated;
+    if (isApproved) data.isApproved = isApproved;
+    if (lead_id) data.lead_id = lead_id;
+    if (approved_on) data.approved_on = new Date(approved_on);
 
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+    await this.prisma.leads.update({
+      where: { id: lead_id },
+      data: {
+        orders_done: {
+          increment: 1,
+        },
+      },
+    });
+
+    return await this.prisma.orders.update({
+      where: { id },
+      data: {
+        ...data,
+      },
+    });
   }
 }
