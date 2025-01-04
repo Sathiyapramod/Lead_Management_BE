@@ -63,24 +63,47 @@ async function main() {
 
   /*---------------- Orders --------------- */
   console.log(`Seeding Orders !!`);
-
-  const ordersPerLead = 3;
+  const ordersPerLead = 30;
   for (const lead of leads) {
     for (let j = 0; j < ordersPerLead; j++) {
+      const placed_on = faker.date.between({
+        from: '2024-01-01',
+        to: Date.now(),
+      });
+
+      let closed_on = null,
+        isApproved = false,
+        approved_on = null;
+
+      if (j % 3 === 0) {
+        closed_on = new Date(placed_on);
+        approved_on = new Date(placed_on);
+        closed_on.setDate(closed_on.getDate() + 3);
+        approved_on.setDate(closed_on.getDate() + 4);
+        isApproved = true;
+      } else if (j % 7 === 0) {
+        closed_on = new Date(placed_on);
+        approved_on = new Date(placed_on);
+        closed_on.setDate(closed_on.getDate() + 7);
+        approved_on.setDate(closed_on.getDate() + 8);
+        isApproved = true;
+      } else if (j % 4 === 0) {
+        closed_on = new Date(placed_on);
+        approved_on = new Date(placed_on);
+        closed_on.setDate(closed_on.getDate() + 14);
+        approved_on.setDate(closed_on.getDate() + 15);
+        isApproved = true;
+      }
+
       await prisma.orders.create({
         data: {
           lead_id: lead,
           order_value: faker.number.int({ min: 100000, max: 500000 }),
-          placed_on: faker.date.between({
-            from: '2024-12-01',
-            to: Date.now(),
-          }),
-          closed_on: faker.date.between({
-            from: '2024-12-10',
-            to: Date.now(),
-          }),
+          placed_on,
+          closed_on,
+          approved_on,
           isCreated: true,
-          isApproved: false,
+          isApproved,
         },
       });
       await prisma.leads.update({
@@ -106,9 +129,10 @@ async function main() {
 
 main()
   .then(() => {
-    console.log(`Seeding Completed`);
+    console.log(`Seeding Completed ✅`);
   })
-  .catch(() => {
+  .catch((err) => {
+    console.log(`🚧 Error 🛑`, err);
     prisma.$disconnect();
   })
   .finally(() => prisma.$disconnect());

@@ -19,4 +19,18 @@ export class PerformanceController {
   async getOrders() {
     return await this.performanceService.getOrders();
   }
+  @Get('managers')
+  async getMgrs() {
+    return await this.performanceService.getMgrs();
+  }
+
+  @Get('stats')
+  async getStats() {
+    return await this.performanceService.getStats();
+  }
+
+  @Get('report')
+  async getReport() {
+    return await this.performanceService.getReport();
+  }
 }

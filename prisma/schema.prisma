@@ -58,27 +58,25 @@ enum CallFreq {
 }
 
 model Leads {
-  id                Int         @id @default(autoincrement())
-  lead_name         String
-  rest_name         String
-  rest_addr1        String
-  rest_addr2        String?
-  phone             String?
-  mgr_id            Int
-  lead_status       Boolean
-  call_freq         CallFreq
-  last_call_date    DateTime?
-  orders_placed     Int?
-  orders_done       Int?
-  created_at        DateTime    @default(now())
-  updated_at        DateTime    @updatedAt
-  contacts          Contacts[]  @relation("LeadContacts")
-  manager           Managers    @relation("ManagerLeads", fields: [mgr_id], references: [id])
-  call_logs         Call_Logs[] @relation("LeadCalls")
-  invoices          Invoices[]  @relation("InvoiceLeads")
-  acc_perfs         AccPerf[]
-  acc_opportunities AccOpps[]
-  Orders            Orders[]
+  id             Int         @id @default(autoincrement())
+  lead_name      String
+  rest_name      String
+  rest_addr1     String
+  rest_addr2     String?
+  phone          String?
+  mgr_id         Int
+  lead_status    Boolean
+  call_freq      CallFreq
+  last_call_date DateTime?
+  orders_placed  Int?
+  orders_done    Int?
+  created_at     DateTime    @default(now())
+  updated_at     DateTime    @updatedAt
+  contacts       Contacts[]  @relation("LeadContacts")
+  manager        Managers    @relation("ManagerLeads", fields: [mgr_id], references: [id])
+  call_logs      Call_Logs[] @relation("LeadCalls")
+  invoices       Invoices[]  @relation("InvoiceLeads")
+  Orders         Orders[]
 
   @@index([phone])
 }
@@ -156,30 +154,6 @@ enum Opp {
   lost
 }
 
-model AccPerf {
-  id          Int      @id @default(autoincrement())
-  lead_id     Int
-  revenue     Int
-  growth_rate Int
-  score       Score
-  last_review DateTime
-  next_review DateTime
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-  lead        Leads    @relation(fields: [lead_id], references: [id])
-}
-
-model AccOpps {
-  id         Int      @id @default(autoincrement())
-  lead_id    Int
-  name       String
-  status     Opp
-  close_date DateTime
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  lead       Leads    @relation(fields: [lead_id], references: [id])
-}
-
 model Orders {
   id          Int       @id @default(autoincrement())
   lead_id     Int
@@ -192,4 +166,6 @@ model Orders {
   approved_on DateTime?
   created_at  DateTime  @default(now())
   updated_at  DateTime  @updatedAt
+
+  @@index([created_at])
 }

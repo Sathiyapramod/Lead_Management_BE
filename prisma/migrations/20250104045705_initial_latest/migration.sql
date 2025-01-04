@@ -104,34 +104,6 @@ CREATE TABLE `Invoices` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `AccPerf` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `lead_id` INTEGER NOT NULL,
-    `revenue` INTEGER NOT NULL,
-    `growth_rate` INTEGER NOT NULL,
-    `score` ENUM('one', 'two', 'three', 'four', 'five') NOT NULL,
-    `last_review` DATETIME(3) NOT NULL,
-    `next_review` DATETIME(3) NOT NULL,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updated_at` DATETIME(3) NOT NULL,
-
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `AccOpps` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `lead_id` INTEGER NOT NULL,
-    `name` VARCHAR(191) NOT NULL,
-    `status` ENUM('new', 'won', 'lost') NOT NULL,
-    `close_date` DATETIME(3) NOT NULL,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updated_at` DATETIME(3) NOT NULL,
-
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
 CREATE TABLE `Orders` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `lead_id` INTEGER NOT NULL,
@@ -144,6 +116,7 @@ CREATE TABLE `Orders` (
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
 
+    INDEX `Orders_created_at_idx`(`created_at`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -161,12 +134,6 @@ ALTER TABLE `Call_Logs` ADD CONSTRAINT `Call_Logs_lead_id_fkey` FOREIGN KEY (`le
 
 -- AddForeignKey
 ALTER TABLE `Invoices` ADD CONSTRAINT `Invoices_lead_id_fkey` FOREIGN KEY (`lead_id`) REFERENCES `Leads`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `AccPerf` ADD CONSTRAINT `AccPerf_lead_id_fkey` FOREIGN KEY (`lead_id`) REFERENCES `Leads`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `AccOpps` ADD CONSTRAINT `AccOpps_lead_id_fkey` FOREIGN KEY (`lead_id`) REFERENCES `Leads`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Orders` ADD CONSTRAINT `Orders_lead_id_fkey` FOREIGN KEY (`lead_id`) REFERENCES `Leads`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -37,7 +37,7 @@ async function bootstrap() {
       ),
     );
   } catch (err) {
-    console.error('Database connection failed:', err);
+    console.error('Database connection failed: 🛑', err);
     await prisma.$disconnect();
     process.exit(1);
   }
