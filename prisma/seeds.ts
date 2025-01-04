@@ -3,10 +3,20 @@ import { faker } from '@faker-js/faker';
 import * as timezone from '../src/utils/timezone.json';
 import * as dotenv from 'dotenv';
 dotenv.config();
+import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
 async function main() {
+  /*---------------- Time Zones --------------- */
+  console.log(`Seeding Timezones !!`);
+  for (const [key, value] of Object.entries(timezone))
+    await prisma.timeZones.create({
+      data: {
+        timezone: key,
+        time_diff: value,
+      },
+    });
   /* ---------------- Managers --------------- */
 
   console.log(`Seeding Managers !!`);
@@ -18,7 +28,16 @@ async function main() {
     },
   });
 
-  const { id } = initial;
+  const { id, mgr_name } = initial;
+
+  await prisma.users.create({
+    data: {
+      username: mgr_name,
+      password: await bcrypt.hash(mgr_name, 10),
+      role: 'KAM',
+      time_id: 1,
+    },
+  });
   /* ---------------- Leads --------------- */
   console.log(`Seeding Leads !!`);
   const leadCount = 50;
@@ -42,6 +61,14 @@ async function main() {
         }),
       },
     });
+    await prisma.users.create({
+      data: {
+        username: newLead.lead_name,
+        password: await bcrypt.hash(newLead.lead_name, 10),
+        role: 'lead',
+        time_id: 1,
+      },
+    });
     leads.push(newLead['id']);
   }
   /* ---------------- Contacts --------------- */
@@ -49,8 +76,8 @@ async function main() {
   console.log(`Seeding Contacts !!`);
   const contactPerLead = 3;
   for (const lead of leads) {
-    for (let j = 0; j < contactPerLead; j++)
-      await prisma.contacts.create({
+    for (let j = 0; j < contactPerLead; j++) {
+      const newContact = await prisma.contacts.create({
         data: {
           lead_id: lead,
           cnct_name: faker.person.fullName(),
@@ -59,6 +86,15 @@ async function main() {
           phone: faker.phone.number({ style: 'international' }),
         },
       });
+      await prisma.users.create({
+        data: {
+          username: newContact.cnct_name,
+          password: await bcrypt.hash(newContact.cnct_name, 10),
+          role: 'lead',
+          time_id: 1,
+        },
+      });
+    }
   }
 
   /*---------------- Orders --------------- */
@@ -116,15 +152,6 @@ async function main() {
       });
     }
   }
-  /*---------------- Time Zones --------------- */
-  console.log(`Seeding Timezones !!`);
-  for (const [key, value] of Object.entries(timezone))
-    await prisma.timeZones.create({
-      data: {
-        timezone: key,
-        time_diff: value,
-      },
-    });
 }
 
 main()

@@ -7,6 +7,7 @@ import {
   Delete,
   Query,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { ContactsService } from './contacts.service';
 import { CreateContactDto, GetContactsQuery } from './dto/create-contact.dto';
@@ -22,8 +23,9 @@ export class ContactsController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRoles.KAM)
-  create(@Body() createContactDto: CreateContactDto) {
-    return this.contactsService.create(createContactDto);
+  create(@Body() createContactDto: CreateContactDto, @Req() req: any) {
+    const { timezone } = req.user;
+    return this.contactsService.create(createContactDto, timezone);
   }
 
   @Get()

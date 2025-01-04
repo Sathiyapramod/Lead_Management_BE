@@ -38,6 +38,8 @@ model TimeZones {
   timezone  String  @unique
   time_diff String
   users     Users[]
+
+  @@index([timezone])
 }
 
 model Managers {

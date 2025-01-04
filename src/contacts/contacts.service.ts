@@ -1,16 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { Contacts } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UsersService } from 'src/users/users.service';
 import { CreateContactDto, GetContactsQuery } from './dto/create-contact.dto';
 
 @Injectable()
 export class ContactsService {
-  constructor(private readonly prisma: PrismaService) {}
-  async create(createContactDto: CreateContactDto) {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly users: UsersService,
+  ) {}
+  async create(createContactDto: CreateContactDto, timezone: string) {
     const { lead_id, cnct_name, cnct_info, cnct_role, phone } =
       createContactDto;
-    return await this.prisma.contacts.create({
+    await this.prisma.contacts.create({
       data: { lead_id, cnct_name, cnct_info, cnct_role, phone },
+    });
+    const currentZone = await this.prisma.timeZones.findUnique({
+      where: { timezone },
+      select: { id: true },
+    });
+    await this.users.create({
+      username: cnct_name,
+      password: cnct_name,
+      role: 'contact',
+      time_id: currentZone['id'].toString(),
     });
   }
 

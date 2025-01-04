@@ -8,6 +8,7 @@ import {
   Query,
   Patch,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { LeadsService } from './leads.service';
 import { Leads } from '@prisma/client';
@@ -31,8 +32,10 @@ export class LeadsController {
   async createLead(
     @Body()
     createLeadDto: CreateLeadDTO,
+    @Req() req: any,
   ): Promise<void> {
-    await this.leadService.create(createLeadDto);
+    const { timezone } = req.user;
+    return await this.leadService.create(createLeadDto, timezone);
   }
 
   @Get()

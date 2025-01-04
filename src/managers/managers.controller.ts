@@ -6,10 +6,11 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ManagersService } from './managers.service';
 import { CreateManagerDto, GetManagersQuery } from './dto/create-manager.dto';
-import { UseGuards } from '@nestjs/common';
+
 import { JwtAuthGuard } from 'src/auth/jwt.authguard';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';

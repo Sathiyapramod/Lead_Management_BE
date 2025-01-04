@@ -6,6 +6,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { LeadsService } from 'src/leads/leads.service';
 import { ManagersService } from 'src/managers/managers.service';
+import { UsersService } from 'src/users/users.service';
 
 @Module({
   imports: [ConfigModule],
@@ -15,6 +16,7 @@ import { ManagersService } from 'src/managers/managers.service';
     JwtService,
     LeadsService,
     ManagersService,
+    UsersService,
   ],
   controllers: [TwilioController],
 })

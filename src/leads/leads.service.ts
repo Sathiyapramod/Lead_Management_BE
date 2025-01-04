@@ -2,12 +2,16 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Leads } from '@prisma/client';
 import { CreateLeadDTO, GetLeadsQuery } from './dto/createLeads.dto';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class LeadsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly users: UsersService,
+  ) {}
 
-  async create(data: CreateLeadDTO): Promise<void> {
+  async create(data: CreateLeadDTO, timezone: string): Promise<void> {
     const {
       lead_name,
       rest_name,
@@ -41,6 +45,16 @@ export class LeadsService {
         orders_done,
         call_freq,
       },
+    });
+    const currentZone = await this.prisma.timeZones.findUnique({
+      where: { timezone },
+      select: { id: true },
+    });
+    await this.users.create({
+      username: lead_name,
+      password: lead_name,
+      role: 'lead',
+      time_id: currentZone.id.toString(),
     });
   }
 

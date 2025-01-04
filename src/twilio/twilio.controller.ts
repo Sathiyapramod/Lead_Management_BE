@@ -18,6 +18,7 @@ export class TwilioController {
   constructor(private readonly twilioService: TwilioService) {}
 
   @Post('calls')
+  @UseGuards(JwtAuthGuard)
   async makeCall(@Query() query: { to: string }) {
     const { to } = query as { to: string };
     if (!to) throw new Error('Phone number is required');
@@ -50,6 +51,7 @@ export class TwilioController {
   }
 
   @Get('token')
+  @UseGuards(JwtAuthGuard)
   async getToken() {
     return await this.twilioService.getToken();
   }
