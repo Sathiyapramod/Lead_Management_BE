@@ -51,7 +51,7 @@ export class OrdersController {
   @ApiOperation({ summary: 'Update order by id' })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRoles.KAM)
+  @Roles(UserRoles.lead, UserRoles.KAM)
   update(@Param('id') id: string, @Body() updateOrderDto: updateOrderDTO) {
     return this.ordersService.update(+id, updateOrderDto);
   }

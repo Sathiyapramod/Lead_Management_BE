@@ -16,4 +16,8 @@ export class updateOrderDTO {
   @IsString()
   @IsOptional()
   approved_on: string;
+
+  @IsString()
+  @IsOptional()
+  closed_on: string;
 }

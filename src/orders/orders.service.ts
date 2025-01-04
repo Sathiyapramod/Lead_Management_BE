@@ -47,6 +47,11 @@ export class OrdersService {
         lead: {
           select: {
             lead_name: true,
+            manager: {
+              select: {
+                mgr_name: true,
+              },
+            },
           },
         },
       },
@@ -64,21 +69,48 @@ export class OrdersService {
     const newOrders = orders.map((odr) => ({
       ...odr,
       lead_name: odr.lead.lead_name,
+      mgr_name: odr.lead.manager.mgr_name,
     }));
     return { orders: newOrders, count, active, pending: count - active };
   }
 
   async findOne(id: number) {
-    return await this.prisma.orders.findFirst({ where: { id } });
+    const result = await this.prisma.orders.findFirst({
+      where: { id },
+      include: {
+        lead: {
+          select: {
+            lead_name: true,
+            manager: {
+              select: {
+                mgr_name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    return {
+      ...result,
+      lead_name: result.lead.lead_name,
+      mgr_name: result.lead.manager,
+    };
   }
 
   async update(id: number, body: updateOrderDTO) {
-    const { isCreated = true, isApproved, lead_id, approved_on } = body;
+    const {
+      isCreated = true,
+      isApproved,
+      lead_id,
+      approved_on,
+      closed_on,
+    } = body;
     const data: any = {};
     if (isCreated) data.isCreated = isCreated;
     if (isApproved) data.isApproved = isApproved;
     if (lead_id) data.lead_id = lead_id;
     if (approved_on) data.approved_on = new Date(approved_on);
+    if (closed_on) data.closed_on = new Date(closed_on);
 
     await this.prisma.leads.update({
       where: { id: lead_id },
