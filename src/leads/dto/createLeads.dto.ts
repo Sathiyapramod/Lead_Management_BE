@@ -48,6 +48,10 @@ export class GetLeadsQuery {
   mgr_id: string;
 
   @IsOptional()
+  @IsString()
+  lead_id: string;
+
+  @IsOptional()
   last_call_date: Date;
 
   @IsOptional()

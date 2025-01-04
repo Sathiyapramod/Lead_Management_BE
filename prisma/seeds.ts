@@ -90,7 +90,7 @@ async function main() {
         data: {
           username: newContact.cnct_name,
           password: await bcrypt.hash(newContact.cnct_name, 10),
-          role: 'lead',
+          role: 'contact',
           time_id: 1,
         },
       });

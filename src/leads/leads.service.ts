@@ -65,6 +65,7 @@ export class LeadsService {
       limit = 10,
       offset = 0,
       mgr_id,
+      lead_id,
       today,
       searchName,
     } = query;
@@ -73,7 +74,7 @@ export class LeadsService {
     if (call_freq) where.call_freq = call_freq;
     if (last_call_date) where.last_call_date = last_call_date;
     if (mgr_id) where.mgr_id = Number(mgr_id);
-
+    if (lead_id) where.lead_id = Number(lead_id);
     if (today) {
       // current date
       const today = new Date();

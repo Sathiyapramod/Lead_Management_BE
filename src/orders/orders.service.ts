@@ -30,10 +30,19 @@ export class OrdersService {
   }
 
   async findAll(query: GetOrdersQuery) {
-    const { limit = 10, offset = 0 } = query;
+    const { limit = 10, offset = 0, lead_name = '' } = query;
+
+    const where: any = {};
+    if (lead_name) {
+      const data = await this.prisma.leads.findFirst({
+        where: { lead_name },
+      });
+      where.lead_id = data['id'];
+    }
     const orders = await this.prisma.orders.findMany({
       take: Number(limit) ?? 10,
       skip: Number(offset) ?? 0,
+      where,
       include: {
         lead: {
           select: {

@@ -34,4 +34,8 @@ export class GetOrdersQuery {
   offset: number;
   @IsOptional()
   today: boolean;
+
+  @IsOptional()
+  @IsString()
+  lead_name: string;
 }

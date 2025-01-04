@@ -81,6 +81,7 @@ model Leads {
   Orders         Orders[]
 
   @@index([phone])
+  @@index([lead_name])
 }
 
 enum Contact_Roles {
