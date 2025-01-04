@@ -17,6 +17,7 @@ CREATE TABLE `TimeZones` (
     `time_diff` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `TimeZones_timezone_key`(`timezone`),
+    INDEX `TimeZones_timezone_idx`(`timezone`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
