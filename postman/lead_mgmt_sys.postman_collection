@@ -1,0 +1,502 @@
+{
+	"info": {
+		"_postman_id": "d342eca0-c1e3-4aa8-9612-e8d22a208241",
+		"name": "KAM Lead Management System - Udaan",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "25089749"
+	},
+	"item": [
+		{
+			"name": "Leads",
+			"item": [
+				{
+					"name": "Get All Leads",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{API}}/leads?limit=10&offset=20",
+							"host": [
+								"{{API}}"
+							],
+							"path": [
+								"leads"
+							],
+							"query": [
+								{
+									"key": "call_freq",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "last_call_date",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "offset",
+									"value": "20"
+								},
+								{
+									"key": "mgr_id",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "today",
+									"value": "true",
+									"disabled": true
+								}
+							]
+						},
+						"description": "### GET /leads\n\nThis endpoint retrieves leads based on specified filters.\n\n#### Request\n\n- Method: GET\n    \n- URL: {{API}}/leads\n    \n- Query Parameters:\n    \n    - call_freq\n        \n    - last_call_date\n        \n    - limit (default: 5)\n        \n    - offset (default: 5)\n        \n    - mgr_id (default: 1)\n        \n\n#### Response\n\nThe response is a JSON array containing lead objects with the following properties:\n\n- id (number)\n    \n- lead_name (string)\n    \n- rest_name (string)\n    \n- rest_addr1 (string)\n    \n- rest_addr2 (string)\n    \n- status (string)\n    \n- phone (string)\n    \n- mgr_id (number)\n    \n- lead_status (boolean)\n    \n- call_freq (null or number)\n    \n- last_call_date (null or string)\n    \n- orders_placed (number)\n    \n- orders_done (number)\n    \n- created_at (string)\n    \n- updated_at (string)\n    \n\nExample response:\n\n``` json\n[\n  {\n    \"id\": 0,\n    \"lead_name\": \"\",\n    \"rest_name\": \"\",\n    \"rest_addr1\": \"\",\n    \"rest_addr2\": \"\",\n    \"status\": \"\",\n    \"phone\": \"\",\n    \"mgr_id\": 0,\n    \"lead_status\": true,\n    \"call_freq\": null,\n    \"last_call_date\": null,\n    \"orders_placed\": 0,\n    \"orders_done\": 0,\n    \"created_at\": \"\",\n    \"updated_at\": \"\"\n  }\n]\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Create New Lead",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"lead_name\": \"Sathiyapramod\",\r\n    \"rest_name\": \"Happy Days\",\r\n    \"rest_addr1\": \"{{$randomStreetName}}\",\r\n    \"rest_addr2\": \"{{$randomStreetName}}\",\r\n    \"lead_status\": false,\r\n    \"mgr_id\": 1,\r\n    \"call_freq\": \"daily\",\r\n    \"phone\": \"+919597097508\",\r\n    \"orders_placed\": 10,\r\n    \"orders_done\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API}}/leads",
+						"description": "The `POST /leads` endpoint is used to submit a new lead to the system.\n\n### Request Parameters\n\n- No specific request parameters are provided.\n    \n\n### Response\n\nThe response of this request is a JSON schema representing the structure of the response data.\n\n``` json\n{\n  \"type\": \"object\",\n  \"properties\": {\n    \"id\": {\n      \"type\": \"string\"\n    },\n    \"name\": {\n      \"type\": \"string\"\n    },\n    \"email\": {\n      \"type\": \"string\"\n    },\n    \"phone\": {\n      \"type\": \"string\"\n    },\n    \"status\": {\n      \"type\": \"string\"\n    }\n  }\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Lead by id",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": "{{API}}/leads/5",
+						"description": "This endpoint retrieves the details of a specific lead with the ID 5.\n\n### Request Body\n\nThis request does not require a request body.\n\n### Response\n\n- `id`: The unique identifier for the lead.\n    \n- `name`: The name of the lead.\n    \n- `email`: The email address of the lead.\n    \n- `phone`: The phone number of the lead.\n    \n- `status`: The status of the lead (e.g., new, contacted, converted).\n    \n- `source`: The source of the lead (e.g., website, referral, advertisement).\n    \n- `created_at`: The date and time when the lead was created.\n    \n- `updated_at`: The date and time when the lead was last updated."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Managers",
+			"item": [
+				{
+					"name": "Get Managers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{API}}/managers?limit=5&offset=5",
+							"host": [
+								"{{API}}"
+							],
+							"path": [
+								"managers"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "5"
+								},
+								{
+									"key": "offset",
+									"value": "5"
+								}
+							]
+						},
+						"description": "The GET request retrieves a list of managers with a limit of 5 and an offset of 5.\n\nThe response is a JSON array containing objects with the following properties:\n\n- id (number): The unique identifier of the manager.\n    \n- mgr_name (string): The name of the manager.\n    \n- role (string): The role of the manager.\n    \n- phone (string): The phone number of the manager.\n    \n- created_at (string): The timestamp indicating when the manager was created.\n    \n- updated_at (string): The timestamp indicating when the manager was last updated."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Calls",
+			"item": [
+				{
+					"name": "Get Call Schedules for the date",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{API}}/calls?date=Wed, 04 Dec 2024 00:00:00 GMT",
+							"host": [
+								"{{API}}"
+							],
+							"path": [
+								"calls"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10",
+									"disabled": true
+								},
+								{
+									"key": "offset",
+									"value": "20",
+									"disabled": true
+								},
+								{
+									"key": "date",
+									"value": "Wed, 04 Dec 2024 00:00:00 GMT"
+								}
+							]
+						},
+						"description": "This endpoint makes an HTTP GET request to retrieve call data based on the specified date. The request should include a query parameter \"date\" with the date value in the format \"Wed, 04 Dec 2024 00:00:00 GMT\".\n\nThe response will include the call data based on the provided date, including details such as call duration, caller information, and call status. The response body will contain the relevant call data in a structured format for further processing."
+					},
+					"response": []
+				},
+				{
+					"name": "Make Call",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{API}}/call-logs/calls?to=+919597097508",
+							"host": [
+								"{{API}}"
+							],
+							"path": [
+								"call-logs",
+								"calls"
+							],
+							"query": [
+								{
+									"key": "to",
+									"value": "+919597097508"
+								}
+							]
+						},
+						"description": "This endpoint allows you to create a new call log entry for a specific phone number. The request should be sent as an HTTP POST to {{API}}/call-logs/calls with the 'to' parameter specifying the phone number to which the call was made.\n\n### Request Body\n\nThe request body should include the following parameters:\n\n- `caller`: (text) The phone number of the caller.\n    \n- `duration`: (text) The duration of the call in seconds.\n    \n- `timestamp`: (text) The timestamp of the call in ISO 8601 format.\n    \n\n### Response Body\n\nUpon successful creation of the call log entry, the response will include the following information:\n\n- `id`: The unique identifier for the call log entry.\n    \n- `caller`: The phone number of the caller.\n    \n- `to`: The phone number to which the call was made.\n    \n- `duration`: The duration of the call in seconds.\n    \n- `timestamp`: The timestamp of the call in ISO 8601 format."
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Call Logs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": "{{API}}/call-logs/call-list",
+						"description": "### Get Call Logs List\n\nThis endpoint retrieves a list of call logs.\n\n#### Request\n\nThe request does not require a request body.\n\n- `{{API}}/call-logs/call-list`\n    \n    - Method: GET\n        \n\n#### Response\n\nThe response will be a JSON object with the following properties:\n\n- `id` (string): The unique identifier for the call log.\n    \n- `caller` (string): The caller's name or number.\n    \n- `receiver` (string): The receiver's name or number.\n    \n- `duration` (number): The duration of the call in seconds.\n    \n- `timestamp` (string): The timestamp of the call.\n    \n- `status` (string): The status of the call (e.g., answered, missed).\n    \n\nExample:\n\n``` json\n{\n  \"id\": \"123456\",\n  \"caller\": \"John Doe\",\n  \"receiver\": \"Jane Smith\",\n  \"duration\": 180,\n  \"timestamp\": \"2022-01-01T12:00:00Z\",\n  \"status\": \"answered\"\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Initialize Token",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": "{{API}}/call-logs/token",
+						"description": "This endpoint retrieves the call logs token. The request does not require any request body. The response will include the call logs token in the JSON format."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Contacts",
+			"item": [
+				{
+					"name": "Get Contacts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{API}}/contacts",
+							"host": [
+								"{{API}}"
+							],
+							"path": [
+								"contacts"
+							],
+							"query": [
+								{
+									"key": "lead_id",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "offset",
+									"value": "10",
+									"disabled": true
+								}
+							]
+						},
+						"description": "### GET /contacts\n\nThis endpoint retrieves a list of contacts.\n\n#### Request\n\nNo request body is required for this endpoint.\n\n#### Response\n\nThe response will be a JSON array containing contact objects with the following properties:\n\n- `id` (number): The unique identifier for the contact.\n    \n- `lead_id` (number): The identifier of the lead associated with the contact.\n    \n- `cnct_name` (string): The name of the contact.\n    \n- `cnct_role` (string): The role of the contact.\n    \n- `cnct_info` (string): Additional information about the contact.\n    \n- `phone` (string): The contact's phone number.\n    \n- `created_at` (string): The date and time when the contact was created.\n    \n- `updated_at` (string): The date and time when the contact was last updated.\n    \n\nExample response:\n\n``` json\n[\n  {\n    \"id\": 0,\n    \"lead_id\": 0,\n    \"cnct_name\": \"\",\n    \"cnct_role\": \"\",\n    \"cnct_info\": \"\",\n    \"phone\": \"\",\n    \"created_at\": \"\",\n    \"updated_at\": \"\"\n  }\n]\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Contact",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{API}}/contacts",
+						"description": "### Add Contact\n\nThis endpoint allows you to add a new contact to the system.\n\n**Request Body**\n\n- The request body should be in JSON format and include the following parameters:\n    \n    - `name` (string, required): The name of the contact.\n        \n    - `email` (string, required): The email address of the contact.\n        \n    - `phone` (string, required): The phone number of the contact.\n        \n\n**Response**\n\n- Upon a successful addition, the response will include a status message confirming the addition of the contact."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Performance",
+			"item": [
+				{
+					"name": "Get Analytics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{API}}/performance/analytics",
+						"description": "### Performance Analytics\n\nThis endpoint allows you to retrieve performance analytics data.\n\n**Request**\n\n- There are no request parameters for this endpoint.\n    \n\n**Response**  \nThe response for this request can be described using the following JSON schema:\n\n``` json\n{\n  \"type\": \"object\",\n  \"properties\": {\n    \"analyticsData\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"metric1\": {\n          \"type\": \"number\"\n        },\n        \"metric2\": {\n          \"type\": \"number\"\n        },\n        ...\n      }\n    }\n  }\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Orders",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": "{{API}}/performance/orders",
+						"description": "### Retrieve Performance Orders\n\nThis endpoint allows you to retrieve performance orders.\n\n#### Request\n\n- Method: GET\n    \n- URL: `{{API}}/performance/orders`\n    \n\n#### Response\n\nThe response for this request can be documented as a JSON schema:\n\n``` json\n{\n  \"type\": \"object\",\n  \"properties\": {\n    \"orderNumber\": {\n      \"type\": \"string\"\n    },\n    \"orderDate\": {\n      \"type\": \"string\",\n      \"format\": \"date-time\"\n    },\n    \"customerName\": {\n      \"type\": \"string\"\n    },\n    \"totalAmount\": {\n      \"type\": \"number\"\n    }\n  }\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Get periodic stats",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": "{{API}}/performance/stats",
+						"description": "# Performance Stats\n\nThis endpoint retrieves performance statistics.\n\n## Request\n\n- Method: GET\n    \n- URL: {{API}}/performance/stats\n    \n\n## Response\n\nThe response for this request can be described using the following JSON schema:\n\n``` json\n{\n  \"type\": \"object\",\n  \"properties\": {\n    \"totalRequests\": {\n      \"type\": \"number\",\n      \"description\": \"Total number of requests\"\n    },\n    \"averageResponseTime\": {\n      \"type\": \"number\",\n      \"description\": \"Average response time in milliseconds\"\n    },\n    \"errorRate\": {\n      \"type\": \"number\",\n      \"description\": \"Percentage of errors in requests\"\n    }\n  }\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Managers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": "{{API}}/performance/managers",
+						"description": "### Get Performance Managers\n\nThis endpoint retrieves a list of performance managers.\n\n#### Request\n\n- Method: GET\n    \n- URL: `{{API}}/performance/managers`\n    \n\n#### Response\n\nThe response for this request is a JSON object following the schema below:\n\n``` json\n{\n  \"type\": \"object\",\n  \"properties\": {\n    \"managers\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"id\": {\n            \"type\": \"string\"\n          },\n          \"name\": {\n            \"type\": \"string\"\n          },\n          \"email\": {\n            \"type\": \"string\"\n          },\n          \"department\": {\n            \"type\": \"string\"\n          }\n        }\n      }\n    }\n  }\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Leads",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": "{{API}}/performance/leads",
+						"description": "### Get Performance Leads\n\nThis endpoint is used to retrieve performance leads.\n\n#### Request Body\n\nThis endpoint does not require a request body.\n\n#### Response\n\n- `leads`: An array of performance leads objects containing information such as lead ID, lead name, and lead status.\n    \n\nExample:\n\n``` json\n{\n    \"leads\": [\n        {\n            \"id\": \"123\",\n            \"name\": \"Lead 1\",\n            \"status\": \"active\"\n        },\n        {\n            \"id\": \"124\",\n            \"name\": \"Lead 2\",\n            \"status\": \"inactive\"\n        }\n    ]\n}\n\n ```"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Report",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": "{{API}}/performance/report",
+						"description": "# Performance Report\n\nThis endpoint allows you to retrieve the performance report.\n\n## Request\n\n- Method: GET\n    \n- URL: {{API}}/performance/report\n    \n\n## Response\n\nThe response will contain the performance report data."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Register user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"john doe\",\r\n    \"password\": \"123456\",\r\n    \"role\": \"KAM\",\r\n    \"time_id\": \"318\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{API}}/auth/register",
+				"description": "The `POST /auth/register` endpoint is used to register a new user with the provided credentials.\n\n### Request Body\n\n- `username` (string): The username of the user.\n    \n- `password` (string): The password for the user account.\n    \n- `role` (string): The role of the user.\n    \n- `timezone` (string): The timezone of the user.\n    \n\n### Response\n\nThe response of this request is a JSON schema. The specific structure of the response will depend on the API implementation and may include fields such as `userId`, `token`, `expiration`, etc."
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Access token is present\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.access_token).to.exist; \r",
+							"    // Check if access_token exists\r",
+							"    \r",
+							"    // Store the access token in an environment variable\r",
+							"    pm.environment.set(\"accessToken\", jsonData.access_token);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"Tony Stark\",\r\n    \"password\": \"123456\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{API}}/auth/login",
+				"description": "### Auth Login\n\nThis endpoint is used to authenticate a user by providing their username and password.\n\n#### Request Body\n\n- `username` (string) - The username of the user.\n    \n- `password` (string) - The password of the user.\n    \n\n#### Response\n\nThe response for this request follows the JSON schema below:\n\n``` json\n{\n  \"type\": \"object\",\n  \"properties\": {\n    \"token\": {\n      \"type\": \"string\"\n    }\n  }\n}\n\n ```\n\nThe response will contain a `token` property which represents the authentication token for the user."
+			},
+			"response": []
+		},
+		{
+			"name": "Logout",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.unset(\"accessToken\");"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{accessToken}}",
+						"type": "text"
+					}
+				],
+				"url": "{{API}}/auth/logout",
+				"description": "This endpoint is used to log out the authenticated user.\n\n### Request Parameters\n\nThis endpoint does not require any request parameters.\n\n### Response\n\nThe response of this request is a JSON object with the following schema:\n\n``` json\n{\n  \"type\": \"object\",\n  \"properties\": {\n    \"message\": {\n      \"type\": \"string\"\n    }\n  }\n}\n\n ```\n\nThe response contains a single property \"message\" of type string, which indicates the status of the logout operation."
+			},
+			"response": []
+		}
+	]
+}

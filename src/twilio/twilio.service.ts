@@ -120,22 +120,24 @@ export class TwilioService {
     try {
       const VoiceGrant = AccessToken.VoiceGrant;
       const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
-      const twilioApiKey = process.env.TWILIO_KEY_SID;
-      const twilioApiSecret = process.env.TWILIO_KEY_SECRET;
+      const twilioApiKey = process.env.TWILI_API_KEY;
+      const twilioApiSecret = process.env.TWILIO_API_SECRET;
 
       const identity = 'user';
-      const voiceGrant = new VoiceGrant({
-        incomingAllow: true,
-      });
-
-      const token = new AccessToken(
+      const accessToken = new AccessToken(
         twilioAccountSid,
         twilioApiKey,
         twilioApiSecret,
         { identity: identity },
       );
-      token.addGrant(voiceGrant);
-      return token.toJwt();
+      const voiceGrant = new VoiceGrant({
+        outgoingApplicationSid: process.env.TWILIO_TWIML_APP_SID,
+        incomingAllow: true,
+      });
+
+      accessToken.addGrant(voiceGrant);
+      const token = accessToken.toJwt();
+      return { token };
     } catch (error) {
       throw error;
     }
