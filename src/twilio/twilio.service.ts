@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Twilio } from 'twilio';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -17,6 +17,7 @@ export class TwilioService {
     private readonly prisma: PrismaService,
     private readonly leads: LeadsService,
     private readonly managers: ManagersService,
+    private readonly logger: Logger,
   ) {
     this.client = new Twilio(
       process.env.TWILIO_KEY_SID,
@@ -38,9 +39,9 @@ export class TwilioService {
         record: true,
         recordingStatusCallback: `${process.env.DEMO_PUBLIC_URL}/call-logs/record-callback`,
       });
-      console.log(`Call is Queued`);
+      this.logger.log(`Call is Queued`);
     } catch (err) {
-      console.log('err', err);
+      this.logger.error('err', err.stack);
       throw new Error('Failed to make call');
     }
   }
@@ -75,7 +76,7 @@ export class TwilioService {
         start_time.getTime() + durationInSeconds * 1000,
       );
 
-      console.log(`Storing Call Log !!!`);
+      this.logger.log(`Storing Call Log !!!`);
       await this.prisma.call_Logs.create({
         data: {
           recording_uri: RecordingUrl,
@@ -89,10 +90,10 @@ export class TwilioService {
           end_time: end_time.toISOString(),
         },
       });
-      console.log(`Updating Lead data !!!`);
+      this.logger.log(`Updating Lead data !!!`);
       await this.leads.updateCallHistory(lead.id, new Date(RecordingStartTime));
     } catch (err) {
-      console.log('err', err);
+      this.logger.error('err', err.stack);
       throw new Error('Failed to Record call');
     }
   }
@@ -111,7 +112,7 @@ export class TwilioService {
         };
       });
     } catch (err) {
-      console.log('err', err);
+      this.logger.error('err', err.stack);
       throw new Error('Failed to Record call');
     }
   }
@@ -120,10 +121,10 @@ export class TwilioService {
     try {
       const VoiceGrant = AccessToken.VoiceGrant;
       const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
-      const twilioApiKey = process.env.TWILI_API_KEY;
+      const twilioApiKey = process.env.TWILIO_API_KEY;
       const twilioApiSecret = process.env.TWILIO_API_SECRET;
 
-      const identity = 'user';
+      const identity = 'kam_app';
       const accessToken = new AccessToken(
         twilioAccountSid,
         twilioApiKey,
@@ -137,9 +138,14 @@ export class TwilioService {
 
       accessToken.addGrant(voiceGrant);
       const token = accessToken.toJwt();
+      this.logger.log('Twilio token generated');
       return { token };
     } catch (error) {
-      throw error;
+      this.logger.error('Error', error.stack);
     }
+  }
+
+  async storeCallLog(callSid: string) {
+    console.log(callSid);
   }
 }

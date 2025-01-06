@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { PrismaClient } from '@prisma/client';
+import { WinstonModule } from 'nest-winston';
+import { instance } from 'logger/winston.logger';
 
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 const prisma = new PrismaClient();
@@ -10,7 +12,11 @@ async function bootstrap() {
   try {
     await prisma.$connect();
     console.log(`🤝 Database Connected Successfully ✅`);
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create(AppModule, {
+      logger: WinstonModule.createLogger({
+        instance: instance,
+      }),
+    });
 
     app.setGlobalPrefix('api/v1');
 

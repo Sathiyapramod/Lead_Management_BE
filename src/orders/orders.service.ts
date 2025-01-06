@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { createOrderDTO, GetOrdersQuery } from './dto/create-order.dto';
 
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -6,27 +6,36 @@ import { updateOrderDTO } from './dto/update-order.dto';
 
 @Injectable()
 export class OrdersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly logger: Logger,
+  ) {}
 
   async create(order: createOrderDTO) {
-    const { lead_id, placed_on, order_value, isCreated, isApproved } = order;
-    await this.prisma.leads.update({
-      where: { id: lead_id },
-      data: {
-        orders_placed: {
-          increment: 1,
+    try {
+      const { lead_id, placed_on, order_value, isCreated, isApproved } = order;
+      await this.prisma.leads.update({
+        where: { id: lead_id },
+        data: {
+          orders_placed: {
+            increment: 1,
+          },
         },
-      },
-    });
-    return await this.prisma.orders.create({
-      data: {
-        lead_id,
-        placed_on: new Date(placed_on),
-        order_value,
-        isCreated,
-        isApproved,
-      },
-    });
+      });
+      const data = await this.prisma.orders.create({
+        data: {
+          lead_id,
+          placed_on: new Date(placed_on),
+          order_value,
+          isCreated,
+          isApproved,
+        },
+      });
+      this.logger.log(`Order - ${data.id} created successfully`);
+      return data;
+    } catch (err) {
+      this.logger.error('Error', err.stack);
+    }
   }
 
   async findAll(query: GetOrdersQuery) {
@@ -98,34 +107,39 @@ export class OrdersService {
   }
 
   async update(id: number, body: updateOrderDTO) {
-    const {
-      isCreated = true,
-      isApproved,
-      lead_id,
-      approved_on,
-      closed_on,
-    } = body;
-    const data: any = {};
-    if (isCreated) data.isCreated = isCreated;
-    if (isApproved) data.isApproved = isApproved;
-    if (lead_id) data.lead_id = lead_id;
-    if (approved_on) data.approved_on = new Date(approved_on);
-    if (closed_on) data.closed_on = new Date(closed_on);
+    try {
+      const {
+        isCreated = true,
+        isApproved,
+        lead_id,
+        approved_on,
+        closed_on,
+      } = body;
+      const data: any = {};
+      if (isCreated) data.isCreated = isCreated;
+      if (isApproved) data.isApproved = isApproved;
+      if (lead_id) data.lead_id = lead_id;
+      if (approved_on) data.approved_on = new Date(approved_on);
+      if (closed_on) data.closed_on = new Date(closed_on);
 
-    await this.prisma.leads.update({
-      where: { id: lead_id },
-      data: {
-        orders_done: {
-          increment: 1,
+      await this.prisma.leads.update({
+        where: { id: lead_id },
+        data: {
+          orders_done: {
+            increment: 1,
+          },
         },
-      },
-    });
+      });
 
-    return await this.prisma.orders.update({
-      where: { id },
-      data: {
-        ...data,
-      },
-    });
+      await this.prisma.orders.update({
+        where: { id },
+        data: {
+          ...data,
+        },
+      });
+      this.logger.log(`Order - ${id} updated successfully`);
+    } catch (err) {
+      this.logger.error('Error', err.stack);
+    }
   }
 }

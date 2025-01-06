@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
@@ -11,6 +11,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly prisma: PrismaService,
+    private readonly logger: Logger,
   ) {}
 
   async validateUser({ username, password }) {
@@ -28,6 +29,7 @@ export class AuthService {
       role: user.role,
       timezone: user.TimeZones.timezone,
     };
+    this.logger.log('User Logged in Successfully');
     return {
       access_token: await this.jwtService.signAsync(payload),
       username: user.username,
@@ -38,6 +40,7 @@ export class AuthService {
   }
 
   async logout() {
+    this.logger.log('User Logged out successfully');
     return { message: 'Logged Out Successfully 👍' };
   }
 

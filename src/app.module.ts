@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Logger } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { LeadsModule } from './leads/leads.module';
@@ -30,6 +30,6 @@ import { PerformanceModule } from './performance/performance.module';
     PerformanceModule,
   ],
   controllers: [AppController, TwilioController],
-  providers: [AppService, PrismaService, TwilioService, JwtService],
+  providers: [AppService, PrismaService, TwilioService, JwtService, Logger],
 })
 export class AppModule {}

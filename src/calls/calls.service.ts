@@ -1,10 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Leads } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class CallsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly logger: Logger,
+  ) {}
   async getCallScheduleByDate(query: Record<string, string>) {
     try {
       const { limit = 10, offset = 0, date } = query;
@@ -29,8 +32,8 @@ export class CallsService {
         leads: revisedLeads,
       };
     } catch (err) {
-      console.log(err);
-      throw new Error('Failed to find Lead');
+      this.logger.log(err, err.stack);
+      throw new Error('Failed to find Call detail');
     }
   }
   private isCallCompleted(lead: Leads, today: Date) {

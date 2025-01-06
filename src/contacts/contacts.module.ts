@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { ContactsService } from './contacts.service';
 import { ContactsController } from './contacts.controller';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -7,6 +7,6 @@ import { UsersService } from 'src/users/users.service';
 
 @Module({
   controllers: [ContactsController],
-  providers: [ContactsService, PrismaService, JwtService, UsersService],
+  providers: [ContactsService, PrismaService, JwtService, UsersService, Logger],
 })
 export class ContactsModule {}

@@ -27,4 +27,7 @@ export class GetContactsQuery {
 
   @IsOptional()
   offset: number;
+
+  @IsOptional()
+  searchName: string;
 }

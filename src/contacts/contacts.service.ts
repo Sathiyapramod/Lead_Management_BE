@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Contacts } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UsersService } from 'src/users/users.service';
@@ -9,29 +9,37 @@ export class ContactsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly users: UsersService,
+    private readonly logger: Logger,
   ) {}
   async create(createContactDto: CreateContactDto, timezone: string) {
-    const { lead_id, cnct_name, cnct_info, cnct_role, phone } =
-      createContactDto;
-    await this.prisma.contacts.create({
-      data: { lead_id, cnct_name, cnct_info, cnct_role, phone },
-    });
-    const currentZone = await this.prisma.timeZones.findUnique({
-      where: { timezone },
-      select: { id: true },
-    });
-    await this.users.create({
-      username: cnct_name,
-      password: cnct_name,
-      role: 'contact',
-      time_id: currentZone['id'].toString(),
-    });
+    try {
+      const { lead_id, cnct_name, cnct_info, cnct_role, phone } =
+        createContactDto;
+      await this.prisma.contacts.create({
+        data: { lead_id, cnct_name, cnct_info, cnct_role, phone },
+      });
+      const currentZone = await this.prisma.timeZones.findUnique({
+        where: { timezone },
+        select: { id: true },
+      });
+      const data = await this.users.create({
+        username: cnct_name,
+        password: cnct_name,
+        role: 'contact',
+        time_id: currentZone['id'].toString(),
+      });
+      this.logger.log(`Contact - ${cnct_name} created successfully`);
+      return data;
+    } catch (err) {
+      this.logger.error('Error', err.stack);
+    }
   }
 
   async findAll(query: GetContactsQuery) {
-    const { limit, offset, lead_id } = query;
+    const { limit, offset, lead_id, searchName } = query;
     const where: any = {};
     if (lead_id) where.lead_id = Number(lead_id);
+    if (searchName) where.cnct_name = { startsWith: searchName };
 
     const contacts = await this.prisma.contacts.findMany({
       where,

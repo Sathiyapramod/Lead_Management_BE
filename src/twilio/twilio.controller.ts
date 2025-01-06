@@ -55,4 +55,9 @@ export class TwilioController {
   async getToken() {
     return await this.twilioService.getToken();
   }
+
+  @Post('store-call-log')
+  async storeCallLog(@Query() callSid: string) {
+    return await this.twilioService.storeCallLog(callSid);
+  }
 }

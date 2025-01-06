@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { TwilioController } from './twilio.controller';
 import { TwilioService } from './twilio.service';
 import { ConfigModule } from '@nestjs/config';
@@ -17,6 +17,7 @@ import { UsersService } from 'src/users/users.service';
     LeadsService,
     ManagersService,
     UsersService,
+    Logger,
   ],
   controllers: [TwilioController],
 })

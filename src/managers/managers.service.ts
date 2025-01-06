@@ -1,17 +1,26 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateManagerDto, GetManagersQuery } from './dto/create-manager.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Managers } from '@prisma/client';
 
 @Injectable()
 export class ManagersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly logger: Logger,
+  ) {}
 
   async create(createManagerDto: CreateManagerDto) {
-    const { mgr_name, role, phone } = createManagerDto;
-    return await this.prisma.managers.create({
-      data: { mgr_name, role, phone },
-    });
+    try {
+      const { mgr_name, role, phone } = createManagerDto;
+      const data = await this.prisma.managers.create({
+        data: { mgr_name, role, phone },
+      });
+      this.logger.log(`Manager - ${mgr_name} created successfully`);
+      return data;
+    } catch (err) {
+      this.logger.error('Err', err.stack);
+    }
   }
 
   async findAll(query: GetManagersQuery) {

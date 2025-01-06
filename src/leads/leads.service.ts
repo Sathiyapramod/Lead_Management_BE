@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Leads } from '@prisma/client';
 import { CreateLeadDTO, GetLeadsQuery } from './dto/createLeads.dto';
@@ -9,31 +9,12 @@ export class LeadsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly users: UsersService,
+    private readonly logger: Logger,
   ) {}
 
   async create(data: CreateLeadDTO, timezone: string): Promise<void> {
-    const {
-      lead_name,
-      rest_name,
-      rest_addr1,
-      rest_addr2,
-      lead_status,
-      mgr_id,
-      phone,
-      orders_placed,
-      orders_done,
-      call_freq,
-    } = data;
-
-    const managerExists = await this.prisma.managers.findUnique({
-      where: { id: mgr_id },
-    });
-
-    if (!managerExists) {
-      throw new NotFoundException(`Manager with ID ${mgr_id} not found`);
-    }
-    await this.prisma.leads.create({
-      data: {
+    try {
+      const {
         lead_name,
         rest_name,
         rest_addr1,
@@ -44,18 +25,44 @@ export class LeadsService {
         orders_placed,
         orders_done,
         call_freq,
-      },
-    });
-    const currentZone = await this.prisma.timeZones.findUnique({
-      where: { timezone },
-      select: { id: true },
-    });
-    await this.users.create({
-      username: lead_name,
-      password: lead_name,
-      role: 'lead',
-      time_id: currentZone.id.toString(),
-    });
+      } = data;
+
+      const managerExists = await this.prisma.managers.findUnique({
+        where: { id: mgr_id },
+      });
+
+      if (!managerExists) {
+        throw new NotFoundException(`Manager with ID ${mgr_id} not found`);
+      }
+      await this.prisma.leads.create({
+        data: {
+          lead_name,
+          rest_name,
+          rest_addr1,
+          rest_addr2,
+          lead_status,
+          mgr_id,
+          phone,
+          orders_placed,
+          orders_done,
+          call_freq,
+        },
+      });
+      this.logger.log(`Lead - ${lead_name} created successfully`);
+      const currentZone = await this.prisma.timeZones.findUnique({
+        where: { timezone },
+        select: { id: true },
+      });
+      await this.users.create({
+        username: lead_name,
+        password: lead_name,
+        role: 'lead',
+        time_id: currentZone.id.toString(),
+      });
+      this.logger.log(`lead - ${lead_name} credentials generated !!!`);
+    } catch (err) {
+      this.logger.error('Error', err.stack);
+    }
   }
 
   async get(query: GetLeadsQuery) {
@@ -119,12 +126,17 @@ export class LeadsService {
   }
 
   async activateLead(id: number): Promise<void> {
-    await this.prisma.leads.update({
-      where: { id },
-      data: {
-        lead_status: true,
-      },
-    });
+    try {
+      await this.prisma.leads.update({
+        where: { id },
+        data: {
+          lead_status: true,
+        },
+      });
+      this.logger.log(`Lead - ${id} - activated successfully`);
+    } catch (err) {
+      this.logger.error('Error', err.stack);
+    }
   }
 
   async findLeadByPhoneNo(phone: string): Promise<{ id: number }> {
@@ -147,8 +159,9 @@ export class LeadsService {
           last_call_date,
         },
       });
+      this.logger.log(`lead - ${lead_id} call history updated`);
     } catch (err) {
-      console.log(err);
+      this.logger.error('Error', err.stack);
       throw new Error('Failed to find Lead');
     }
   }
