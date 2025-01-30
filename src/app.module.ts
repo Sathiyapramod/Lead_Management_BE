@@ -15,6 +15,9 @@ import { JwtService } from '@nestjs/jwt';
 import { CallsModule } from './calls/calls.module';
 import { OrdersModule } from './orders/orders.module';
 import { PerformanceModule } from './performance/performance.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import { MenuService } from './menu/menu.service';
+import { MenuModule } from './menu/menu.module';
 
 @Module({
   imports: [
@@ -28,8 +31,19 @@ import { PerformanceModule } from './performance/performance.module';
     CallsModule,
     OrdersModule,
     PerformanceModule,
+    CacheModule.register({
+      isGlobal: true,
+    }),
+    MenuModule,
   ],
   controllers: [AppController, TwilioController],
-  providers: [AppService, PrismaService, TwilioService, JwtService, Logger],
+  providers: [
+    AppService,
+    PrismaService,
+    TwilioService,
+    JwtService,
+    Logger,
+    MenuService,
+  ],
 })
 export class AppModule {}

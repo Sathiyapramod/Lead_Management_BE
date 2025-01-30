@@ -4,6 +4,7 @@ import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { TimeZones } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { MenuService } from '../menu/menu.service';
 
 @Injectable()
 export class AuthService {
@@ -12,6 +13,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly prisma: PrismaService,
     private readonly logger: Logger,
+    private readonly menuService: MenuService,
   ) {}
 
   async validateUser({ username, password }) {
@@ -36,6 +38,7 @@ export class AuthService {
       role: user.role,
       userId: user.id,
       timezone: user.TimeZones.timezone,
+      menu: await this.menuService.getMenuByRole(user.role),
     };
   }
 

@@ -6,13 +6,13 @@ import { Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Roles } from '@prisma/client';
+import { MenuService } from '../menu/menu.service';
 
 describe('AuthService', () => {
   let service: AuthService;
   let usersService: UsersService;
   let jwtService: JwtService;
-  let prismaService: PrismaService;
-  let logger: Logger;
+  let menuService: MenuService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -28,6 +28,12 @@ describe('AuthService', () => {
           provide: JwtService,
           useValue: {
             signAsync: jest.fn(),
+          },
+        },
+        {
+          provide: MenuService,
+          useValue: {
+            getMenuByRole: jest.fn(),
           },
         },
         {
@@ -49,7 +55,8 @@ describe('AuthService', () => {
     service = module.get<AuthService>(AuthService);
     usersService = module.get<UsersService>(UsersService);
     jwtService = module.get<JwtService>(JwtService);
-    logger = module.get<Logger>(Logger);
+
+    menuService = module.get<MenuService>(MenuService);
   });
 
   it('should be defined', async () => {
@@ -65,6 +72,7 @@ describe('AuthService', () => {
         id: 203,
         role: Roles['KAM'],
         time_id: 318,
+        menu: ['Home', 'Order', 'Lead', 'Contact'],
         TimeZones: {
           timezone: 'Asia/Vientiane',
         },
@@ -128,9 +136,12 @@ describe('AuthService', () => {
           timezone: 'Asia/Vientiane',
         },
       };
+      const mockMenus = ['Home', 'Order', 'Lead', 'Contact'];
+
       jest.spyOn(service, 'validateUser').mockResolvedValue(user);
       jest.spyOn(jwtService, 'signAsync').mockResolvedValue('dummy_token');
-      const loginDto = { username: 'john doe', password: '123456' };
+      jest.spyOn(menuService, 'getMenuByRole').mockResolvedValue(mockMenus);
+
       const result = await service.login(user);
       expect(service.validateUser).not.toHaveBeenCalled();
       expect(jwtService.signAsync).toHaveBeenCalledWith({
@@ -145,6 +156,7 @@ describe('AuthService', () => {
         role: user.role,
         userId: user.id,
         timezone: user.TimeZones.timezone,
+        menu: mockMenus,
       });
     });
 

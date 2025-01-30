@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Contacts } from '@prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { UsersService } from 'src/users/users.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { UsersService } from '../users/users.service';
 import { CreateContactDto, GetContactsQuery } from './dto/create-contact.dto';
 
 @Injectable()
